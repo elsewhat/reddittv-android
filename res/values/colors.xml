@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <color name="white">#ffffffff</color>
+    <color name="grey">#ff888888</color>
+    <color name="light_grey">#ffcccccc</color>
+    <color name="dark_grey">#ff212121</color>
+    <color name="dark_transparent">#c1000000</color>
+    <color name="light_transparent">#40ffffff</color>
+    <color name="ics_blue">#ff33B5E5</color>
+    <color name="black">#ff020202</color>
+    <color name="ics_background_start">#ff020202</color>
+    <color name="ics_background_end">#ff272D33</color>
+    <color name="red">#ffdd0000</color>
+    <color name="reddit_blue">#CEE3F8FF</color>
+    <color name="reddit_light_blue">#EFF7FFFF</color>
+    <color name="reddit_light_gray">#F0F3FCFF</color>
+</resources>

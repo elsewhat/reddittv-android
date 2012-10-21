@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="hello">Hello World, RedditTV!</string>
+	<string name="app_name">RedditTV</string>
+	<string name="app_name_preferences">Setup</string>
+	
+	<string name="listNoVideos">No videos loaded</string>
+	<string name="listLoadMore">Load more videos</string>
+	<string name="listLoadingMore">Loading videos</string>
+	<string name="subreddit_select_prompt">Please select a subreddit to watch videos from
+	</string>
+	<string name="mediacenterNotConfigured">Media center connection not configured.\nPlease go to settings.</string>
+	
+	<string-array name="subreddit_select_values">
+		<item>reddit.com</item>
+		<item>videos</item>
+		<item>Minecraft</item>
+		<item>listentothis</item>
+		<item>music</item>
+		<item>gaming</item>
+		<item>funny</item>
+		<item>WTF</item>
+		<item>science</item>
+		<item>geek</item>
+		<item>documentaries</item>
+		<item>entertainment</item>
+		<item>humor</item>
+		<item>movies</item>
+		<item>sport</item>
+		<item>politics</item>
+		<item>aww</item>
+		<item>frontpage</item>
+		<item>new</item>
+	</string-array>
+	<string name="menu_manage_subreddits">Manage subreddits...</string>
+	
+	<string-array name="multiple_pages">
+		<item>1 page</item>
+		<item>2 pages</item>
+		<item>3 pages</item>
+		<item>4 pages</item>
+		<item>5 pages</item>
+		</string-array>
+	<string-array name="multiple_pages_values">
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		</string-array>	
+		
+	<string-array name="default_click_action">
+		<item>Watch</item>
+		<item>Send to GoogleTV</item>
+		<item>Send to XBMC</item>
+		<item>ListenTo (beta)</item>
+	</string-array>
+	<string-array name="default_click_action_values">
+		<item>watch</item>
+		<item>googletv</item>
+		<item>xbmc</item>
+		<item>listento</item>
+	</string-array>		
+	
+	<string-array name="themes">
+		<item>Normal</item>
+		<item>Large</item>
+	</string-array>
+	<string-array name="themes_values">
+		<item>Theme.Normal</item>
+		<item>Theme.Large</item>
+	</string-array>	
+
+	<string name="contextMenuWatch">Watch</string>
+	<string name="contextMenuComments">View comments</string>
+	<string name="contextMenuSendTo">Send to GoogleTV++</string>
+	<string name="contextMenuSendToView">Send to XBMC</string>
+	<string name="contextMenuFavorite">Add to saved</string>
+	<string name="contextMenuUpvote">Upvote</string>
+	<string name="contextMenuDownvote">Downvote</string>
+	<string name="contextListenTo">ListenTo (beta)</string>
+	
+	<string name="menuPickSubreddit">Pick subreddit</string>
+	<string name="menuSortBy">Category</string>
+	<string name="menuClearList">Clear list</string>
+	<string name="menuPreferences">Settings</string>
+	<string name="menuAbout">About</string>
+	
+
+<string name="lblSubreddit">subreddit:</string>
+<string name="lblCategory">category:</string>
+<string name="lblPeriod">period:</string>
+
+<string name="msgLoginFailed">Login to reddit failed. Please try again later</string>
+<string name="msgNewThemeReloading">Applying shiny new theme \n(requires reload of app)</string>
+
+	<string name="backButtonInfoOnWatch">Press back to return to RedditTV</string>
+<string name="lblCategoryUser">Reddit user</string>
+<string name="lblCategoryOnStartup">Startup</string>
+<string name="lblCategorySubreddits">Manage subreddits</string>
+<string name="lblCategoryGeneral">General configuration</string>
+<string name="lblCategoryCurrentSubreddits">Current subreddits</string>
+
+<string name="lblCategoryMediaCenter">Media center (XBMC)</string>
+<string name="lblCategoryOther">Other</string>
+<string name="lblCategoryOtherWTF">Other - WTF</string>
+
+<string name="lblThemeDialogTitle">Select the theme to use</string>
+<string name="lblThemeSummary">Theme:</string>
+<string name="lblThemeTitle">Theme</string>
+
+
+<string name="lblDefaultActionDialogTitle">Select the default action on click</string>
+<string name="lblDefaultActionSummary">will be executed on click</string>
+<string name="lblDefaultActionTitle">Default action</string>
+
+<string name="lblSubredditOnStartupDialogTitle">Select subreddit</string>
+<string name="lblSubredditOnStartupSummary">will load on startup</string>
+<string name="lblSubredditOnStartupTitle">Subreddit</string>
+
+<string name="lblSubredditPagesOnStartupDialogTitle">Select number of pages</string>
+<string name="lblSubredditPagesOnStartupSummary">will load on startup</string>
+<string name="lblSubredditPagesOnStartupTitle">Number of pages</string>
+
+<string name="lblCategoryOnStartupDialogTitle">Select category and period</string>
+<string name="lblCategoryOnStartupSummary">will load on startup</string>
+<string name="lblCategoryOnStartupTitle">Category and Period</string>
+
+<string name="lblCustomSubredditsSummary">Add and remove subreddits</string>
+<string name="lblCustomSubredditsTitle">Manage subreddits</string>
+
+<string name="lblNewSubredditTitle">Add new subreddit</string>
+<string name="lblNewSubredditSummary">Type the name of a subreddit</string>
+<string name="lblNewSubredditDialogTitle">Please enter a subreddit</string>
+
+<string name="lblUsernameDialogTitle">Reddit username</string>
+<string name="lblUsernameTitle">Username</string>
+<string name="lblUsernameSummaryBlank">Please enter a reddit username</string>
+
+<string name="lblPasswordDialogTitle">Password</string>
+<string name="lblPasswordTitle">Password</string>
+<string name="lblPasswordSummaryBlank">Please enter password</string>
+<string name="lblPasswordSummary">Password</string>
+
+<string name="lblLogoutTitle">Logout</string>
+<string name="lblLogoutDialogTitle">Are you sure you want to log out?</string>
+<string name="lblLogoutSummary">Click to logout from reddit in case of issues</string>
+
+
+<string name="lblMCHostDialogTitle">Mediacenter hostname</string>
+<string name="lblMCHostTitle">Hostname</string>
+<string name="lblMCHostSummaryBlank">Please enter the hostname or IP for your Media Center (XBMC)</string>
+
+<string name="lblMCPortDialogTitle">Mediacenter port</string>
+<string name="lblMCPortTitle">Port</string>
+<string name="lblMCPortSummaryBlank">Please enter the port for your Media Center (XBMC)</string>
+
+<string name="lblMCUserDialogTitle">Mediacenter username</string>
+<string name="lblMCUserTitle">Mediacenter username</string>
+<string name="lblMCUserSummaryBlank">Please enter the user for your Media Center (XBMC)</string>
+
+<string name="lblMCPasswordDialogTitle">Mediacenter password</string>
+<string name="lblMCPasswordTitle">Mediacenter password</string>
+<string name="lblMCPasswordSummaryBlank">Please enter the password for your Media Center (XBMC)</string>
+<string name="lblMCPasswordSummary">Media Center (XBMC) password is set</string>
+
+<string name="lblDoStartXBMCRemoteTitle">Start XBMC Remote app</string>
+<string name="lblDoStartXBMCRemoteSummary">Start the official XBMC Remote app when executing Send to XBMC</string>
+
+<string name="lblAnalyticsTitle">Analytics</string>
+<string name="lblAnalyticsSummary">Allow anonymous analytics in order to improve app</string>
+
+<string name="lblResetSettingTitle">Reset settings</string>
+<string name="lblResetSettingDialogTitle">Are you sure you want to reset all settings to default values (including subreddits)?</string>
+<string name="lblResetSettingSummary">Reset all settings to default value</string>
+
+<string name="lblRickrollTitle">Rickroll mode</string>
+<string name="lblRickrollSummary">Enable Rickroll mode</string>
+
+<string name="lblRickrollProbabilityTitle">Rickroll probability</string>
+<string name="lblRickrollProbabilityDialogTitle">Rickroll probability (1-100)</string>
+<string name="lblRickrollProbabilitySummary">Rickroll probability is</string>
+
+</resources>
+

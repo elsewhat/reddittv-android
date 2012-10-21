@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!-- <dimen name="extra_small_font_size">12.0dip</dimen>
+
+    <dimen name="thumbnail_width">80.0dip</dimen>
+    <dimen name="thumbnail_height">60.0dip</dimen>
+    <dimen name="avatar_width">76.0dip</dimen>
+    <dimen name="avatar_height">76.0dip</dimen>
+    <dimen name="small_thumbnail_width">40.0dip</dimen>
+    <dimen name="small_thumbnail_height">40.0dip</dimen>
+    <dimen name="list_item_padding">6.0dip</dimen>
+        <dimen name="header_text_horizontal_padding">6.0dip</dimen>
+    
+    -->
+    <dimen name="medium_preview_width">80.0dip</dimen>
+    <dimen name="medium_preview_height">60.0dip</dimen>
+    <dimen name="large_preview_width">120.0dip</dimen>
+    <dimen name="large_preview_height">90.0dip</dimen>
+    
+    <dimen name="footer_height">40.0dip</dimen>   
+    <dimen name="header_height">51.0dip</dimen>
+    <dimen name="extra_small_font_size">12.0dip</dimen>
+    <dimen name="small_font_size">13.0dip</dimen>
+    <dimen name="medium_font_size">15.0dip</dimen>
+    <dimen name="large_font_size">16.5dip</dimen>
+    <dimen name="xlarge_font_size">19dip</dimen>
+</resources>

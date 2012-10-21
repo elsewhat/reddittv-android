@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              >
+
+    <LinearLayout android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      		<include layout="@layout/header_ics" />          
+    </LinearLayout>
+
+  <ListView android:id="@+id/video_list"
+      android:layout_width="fill_parent"
+      android:layout_height="0dip"
+      android:layout_weight="1" 
+      android:dividerHeight="2dip"
+      android:background="@drawable/app_background_ics"
+      android:listSelector="@drawable/list_selector_background_ics"
+      android:cacheColorHint="#00000000"/> 
+</LinearLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- View styles -->
+    <attr name="styleVideoTitle" format="reference" />
+    
+	<attr name="styleAppTitle" format="reference" />
+	<attr name="styleLoadMoreTitle" format="reference" />
+	<attr name="styleReddit" format="reference" />
+	<attr name="styleComments" format="reference" />
+	<attr name="styleVotes" format="reference" />
+	<attr name="styleCategory" format="reference" />
+	<attr name="styleVideoThumbnail" format="reference" />
+
+</resources>

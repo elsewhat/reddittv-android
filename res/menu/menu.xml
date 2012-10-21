@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/menuPickSubreddit" android:title="@string/menuPickSubreddit"
+		android:icon="@android:drawable/ic_menu_myplaces" />
+	<item android:id="@+id/menuSortBy" android:title="@string/menuSortBy"
+		android:icon="@android:drawable/ic_menu_sort_by_size" />
+	<item android:id="@+id/menuClearList" android:title="@string/menuClearList"
+		android:icon="@android:drawable/ic_menu_close_clear_cancel" />
+		
+	<item android:id="@+id/menuAbout" android:title="@string/menuAbout"
+		android:icon="@android:drawable/ic_menu_info_details" />		
+	<item android:id="@+id/menuPreferences" android:title="@string/menuPreferences"
+		android:icon="@android:drawable/ic_menu_preferences" />
+</menu>
