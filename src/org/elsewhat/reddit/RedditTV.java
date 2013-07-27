@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Random;
 
 
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -14,8 +13,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.xbmc.android.remote.business.Command;
 import org.xbmc.api.business.DataResponse;
 import org.xbmc.api.business.INotifiableManager;
-import org.xbmc.httpapi.Connection;
-import org.xbmc.httpapi.client.ControlClient;
+//import org.xbmc.httpapi.Connection;
+//import org.xbmc.httpapi.client.ControlClient;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -343,7 +342,7 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 		INotifiableManager xbmcManager = new INotifiableManager() {  
             public void onError(Exception e) {
             	Log.e("RedditTV", "Failed to integrate with XBMC",e);
-            	notifyUser("Failed to integrate with XBMC. Error " + e.toString());
+            	notifyUser("Failed to integrate with XBMC. Try swapping XBMC API type in settings. Error " + e.toString());
             }
 
 			@Override
@@ -380,18 +379,29 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 				
 			}
 		};
-		//TODO read from preferences		
-		Connection xbmcConnection= Connection.getInstance(mcHostname, mcPort);
-		xbmcConnection.setAuth(mcUser, mcPassword);
-		//force update in case of changed preferences
-		xbmcConnection.setHost(mcHostname, mcPort);
 		
-		ControlClient xbmcClient = new ControlClient(xbmcConnection);
-		
-		Log.d("RedditTV", "Connecting to XBMC with host"+mcHostname+ " and port"+ mcPort);
-		//TODO: Get youtube id
-		xbmcClient.playUrl(xbmcManager, "plugin://plugin.video.youtube/?action=play_video&videoid="+redditPost.getYoutubeId());
-		
+		String mcProtocol= settings.getString(RedditTVPreferences.KEY_MEDIACENTER_PROTOCOL,RedditTVPreferences.DEFAULT_VALUE_MEDIACENTER_PROTOCOL);
+		//main protocol is now JSON RPC
+		if(mcProtocol.equalsIgnoreCase("http")){
+			org.xbmc.httpapi.Connection xbmcConnection = org.xbmc.httpapi.Connection.getInstance(mcHostname, mcPort);
+			xbmcConnection.setAuth(mcUser, mcPassword);
+			//force update in case of changed preferences
+			xbmcConnection.setHost(mcHostname, mcPort);
+			org.xbmc.httpapi.client.ControlClient xbmcClient = new org.xbmc.httpapi.client.ControlClient(xbmcConnection);
+			
+			Log.d("RedditTV", "Connecting to XBMC HTTP api with host "+mcHostname+ " and port "+ mcPort);
+			xbmcClient.playUrl(xbmcManager, "plugin://plugin.video.youtube/?action=play_video&videoid="+redditPost.getYoutubeId());
+		}else {
+			org.xbmc.jsonrpc.Connection xbmcConnection = org.xbmc.jsonrpc.Connection.getInstance(mcHostname, mcPort);
+			xbmcConnection.setAuth(mcUser, mcPassword);
+			//force update in case of changed preferences
+			xbmcConnection.setHost(mcHostname, mcPort);
+			org.xbmc.jsonrpc.client.ControlClient xbmcClient = new org.xbmc.jsonrpc.client.ControlClient(xbmcConnection);
+			
+			Log.d("RedditTV", "Connecting to XBMC JSONRPC with host "+mcHostname+ " and port "+ mcPort);
+			xbmcClient.playUrl(xbmcManager, "plugin://plugin.video.youtube/?action=play_video&videoid="+redditPost.getYoutubeId());
+		}
+			
 		//see if we should launch the official XBMC remote
 		boolean doLaunchXBMCRemote = settings.getBoolean(RedditTVPreferences.KEY_DO_START_XBMC_REMOTE, RedditTVPreferences.DEFAULT_VALUE_DO_START_XBMC_REMOTE);
 		if(doLaunchXBMCRemote){

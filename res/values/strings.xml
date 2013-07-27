@@ -164,6 +164,19 @@
 <string name="lblMCPasswordSummaryBlank">Please enter the password for your Media Center (XBMC)</string>
 <string name="lblMCPasswordSummary">Media Center (XBMC) password is set</string>
 
+
+<string name="lblMCProtocolDialogTitle">Select API type to use when connecting to XBMC</string>
+<string name="lblMCProtocolTitle">XBMC API type</string>
+	<string-array name="mediacenter_protocols">
+		<item>JSON RPC</item>
+		<item>HTTP (deprecated)</item>
+		</string-array>
+	<string-array name="mediacenter_protocols_value">
+		<item>jsonrpc</item>
+		<item>http</item>
+	</string-array>	
+
+
 <string name="lblDoStartXBMCRemoteTitle">Start XBMC Remote app</string>
 <string name="lblDoStartXBMCRemoteSummary">Start the official XBMC Remote app when executing Send to XBMC</string>
 

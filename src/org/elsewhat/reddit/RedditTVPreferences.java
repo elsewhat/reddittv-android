@@ -58,6 +58,7 @@ public class RedditTVPreferences extends PreferenceActivity implements
 	public static final String KEY_MEDIACENTER_HOSTNAME = "mediacenterhost";
 	public static final String KEY_MEDIACENTER_PORT = "mediacenterport";
 	public static final String KEY_DO_START_XBMC_REMOTE = "dostartxbmcremote";
+	public static final String KEY_MEDIACENTER_PROTOCOL = "mediacenterprotocol";
 
 	public static final String KEY_REDDIT_COOKIE_VALUE = "redditcookievalue";
 	public static final String KEY_REDDIT_COOKIE_DOMAIN = "redditcookiedomain";
@@ -75,6 +76,7 @@ public class RedditTVPreferences extends PreferenceActivity implements
 	public static final String DEFAULT_VALUE_MEDIACENTER_USERNAME = "xbmc";
 	public static final int DEFAULT_VALUE_MEDIACENTER_PORT = 8080;
 	public static final boolean DEFAULT_VALUE_DO_START_XBMC_REMOTE = true;
+	public static final String DEFAULT_VALUE_MEDIACENTER_PROTOCOL = "jsonrpc";
 	public static final boolean DEFAULT_VALUE_DO_RICKROLL = false;
 	public static final String DEFAULT_VALUE_RICKROLL_PERCENTAGE = "50";
 	//Should match the theme_values in strings
@@ -103,7 +105,9 @@ public class RedditTVPreferences extends PreferenceActivity implements
 	protected EditTextPreference editTextMCPort;
 	protected EditTextPreference editTextMCUser;
 	protected EditTextPreference editTextMCPassword;
+	protected ListPreference lpMCProtocol;
 	protected CheckBoxPreference cbDoStartXBMCRemote;
+	
 
 	protected EditTextPreference editCustomSubreddit;
 	protected ListPreference lpDefaultAction;
@@ -308,6 +312,18 @@ public class RedditTVPreferences extends PreferenceActivity implements
 		editTextMCPassword.setDialogTitle(R.string.lblMCPasswordDialogTitle);
 		editTextMCPassword.setTitle(R.string.lblMCPasswordTitle);
 		mcCat.addPreference(editTextMCPassword);
+		
+
+		lpMCProtocol = new ListPreference(this);
+		lpMCProtocol.setEntries(getResources().getStringArray(
+				R.array.mediacenter_protocols));
+		lpMCProtocol.setEntryValues(getResources().getStringArray(
+				R.array.mediacenter_protocols_value));
+		lpMCProtocol.setKey(KEY_MEDIACENTER_PROTOCOL);
+		lpMCProtocol.setDialogTitle(R.string.lblMCProtocolDialogTitle);
+		lpMCProtocol.setTitle(R.string.lblMCProtocolTitle);
+		lpMCProtocol.setDefaultValue(DEFAULT_VALUE_MEDIACENTER_PROTOCOL);
+		mcCat.addPreference(lpMCProtocol);
 
 		cbDoStartXBMCRemote = new CheckBoxPreference(this);
 		cbDoStartXBMCRemote.setDefaultValue(new Boolean(
@@ -457,6 +473,8 @@ public class RedditTVPreferences extends PreferenceActivity implements
 			editTextMCPort.setSummary(R.string.lblMCPortSummaryBlank);
 		}
 
+		lpMCProtocol.setSummary(lpMCProtocol.getValue());
+		
 		editTextRickrollPercentage.setSummary(getResources().getString(
 				R.string.lblRickrollProbabilitySummary)
 				+ " " + editTextRickrollPercentage.getText() + "%");
