@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="org.elsewhat.reddit" android:versionCode="14"
-	android:versionName="1.1"
+	package="org.elsewhat.reddit" android:versionCode="15"
+	android:versionName="1.11"
 	android:installLocation="auto"
 	
 	>

@@ -11,6 +11,8 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.xbmc.android.remote.business.Command;
+import org.xbmc.api.business.DataResponse;
 import org.xbmc.api.business.INotifiableManager;
 import org.xbmc.httpapi.Connection;
 import org.xbmc.httpapi.client.ControlClient;
@@ -343,6 +345,40 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
             	Log.e("RedditTV", "Failed to integrate with XBMC",e);
             	notifyUser("Failed to integrate with XBMC. Error " + e.toString());
             }
+
+			@Override
+			public void onFinish(DataResponse<?> response) {
+				Log.e("RedditTV", "onFinish");
+            	//notifyUser("Failed to integrate with XBMC. Error " + e.toString());
+				
+			}
+
+			@Override
+			public void onWrongConnectionState(int state, Command<?> cmd) {
+				Log.e("RedditTV", "xbmc onWrongConnectionState");
+            	notifyUser("Failed to integrate with XBMC. Error wrongconnectionstate "+state);
+				
+			}
+
+			@Override
+			public void onMessage(String message) {
+				Log.e("RedditTV", "xbmc onMessage " + message);
+            	notifyUser("XBMC message: " + message);
+				
+			}
+
+			@Override
+			public void onMessage(int code, String message) {
+				Log.e("RedditTV", "xbmc onMessage " + message + " "+ code);
+            	notifyUser("XBMC message: " + message+ " "+ code);
+				
+			}
+
+			@Override
+			public void retryAll() {
+				Log.e("RedditTV", "xbmc retry all");
+				
+			}
 		};
 		//TODO read from preferences		
 		Connection xbmcConnection= Connection.getInstance(mcHostname, mcPort);
