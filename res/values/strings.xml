@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="hello">Hello World, RedditTV!</string>
-	<string name="app_name">RedditTV</string>
+	<string name="app_name">Narwhal TV for reddit</string>
 	<string name="app_name_preferences">Setup</string>
 	
 	<string name="listNoVideos">No videos loaded</string>
@@ -94,7 +93,7 @@
 <string name="msgLoginFailed">Login to reddit failed. Please try again later</string>
 <string name="msgNewThemeReloading">Applying shiny new theme \n(requires reload of app)</string>
 
-	<string name="backButtonInfoOnWatch">Press back to return to RedditTV</string>
+<string name="backButtonInfoOnWatch">Press back to return to Narwhal TV</string>
 <string name="lblCategoryUser">Reddit user</string>
 <string name="lblCategoryOnStartup">Startup</string>
 <string name="lblCategorySubreddits">Manage subreddits</string>
