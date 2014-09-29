@@ -494,25 +494,26 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menuPickSubreddit:
+		
+		
+		int itemId = item.getItemId();
+		if (itemId == R.id.menuPickSubreddit) {
 			displayPickSubredditDialog();
 			return true;
-		case R.id.menuSortBy:
+		} else if (itemId == R.id.menuSortBy) {
 			displayCategoryDialog();
 			return true;
-		case R.id.menuClearList:
+		} else if (itemId == R.id.menuClearList) {
 			actionClearList();
-
 			return true;
-		case R.id.menuAbout:
+		} else if (itemId == R.id.menuAbout) {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://redd.it/gsmet")));
 			return true;
-		case R.id.menuPreferences:
+		} else if (itemId == R.id.menuPreferences) {
 			Intent iPreferences = new Intent(this, RedditTVPreferences.class);
 			startActivity(iPreferences);
 			return true;
-		default:
+		} else {
 			return super.onMenuItemSelected(featureId, item);
 		}
 
