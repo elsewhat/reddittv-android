@@ -24,6 +24,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.provider.Settings.Secure;
 import android.util.Log;
 
 
@@ -257,11 +259,16 @@ public class RedditAPI {
 		DefaultHttpClient httpClient = new DefaultHttpClient();
 		HttpGet request = new HttpGet(urlString);
 		
+		
 		if(isLoggedIn(c)){
 			CookieStore cookieStore = httpClient.getCookieStore();
 			cookieStore.addCookie(redditSessionCookie);
+			httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "org.elsewhat.reddit narwhal TV/1.4 "+loggedInUser);
 		}else {
 			loggedInUser=null;
+			String androidId = Secure.getString(c.getContentResolver(),
+                    Secure.ANDROID_ID); 
+			httpClient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, "org.elsewhat.reddit narwhal TV/1.4 "+androidId);
 		}
 		
 		ResponseHandler<String> responseHandler=new BasicResponseHandler();
