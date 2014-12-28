@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
@@ -14,6 +13,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.xbmc.api.business.INotifiableManager;
 import org.xbmc.httpapi.Connection;
 import org.xbmc.httpapi.client.ControlClient;
+
+import com.google.android.gms.cast.CastDevice;
+import com.google.android.gms.cast.CastMediaControlIntent;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -33,6 +35,13 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.MediaRouteActionProvider;
+import android.support.v7.media.MediaRouteSelector;
+import android.support.v7.media.MediaRouter;
+import android.support.v7.media.MediaRouter.Callback;
+import android.support.v7.media.MediaRouter.RouteInfo;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -54,7 +63,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
 @SuppressLint("WorldReadableFiles")
-public class RedditTV extends Activity implements OnCreateContextMenuListener,
+public class RedditTV extends ActionBarActivity implements OnCreateContextMenuListener,
 		OnItemClickListener, OnClickListener, OnLongClickListener, OnSharedPreferenceChangeListener {
 	private static final int ACTION_WATCH = Menu.FIRST;
 	private static final int ACTION_COMMENTS = Menu.FIRST + 1;
@@ -84,6 +93,9 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 	private static final String INTENT_STOP_LISTENTO="STOPLISTENTO";
 	
 	private boolean themeHasBeenChanged = false;
+	private MediaRouter mMediaRouter=null;
+	private MediaRouteSelector mMediaRouteSelector;
+	private Callback mMediaRouterCallback;
 	
 	
 	
@@ -94,16 +106,22 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d("RedditTV", "onCreate called");
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		SharedPreferences settings = getSharedPreferences(RedditTVPreferences.PREFS_NAME, MODE_WORLD_READABLE);
 		settings.registerOnSharedPreferenceChangeListener(this);
-		setTheme(settings);
+		//setTheme(settings);
 		
 		setContentView(R.layout.main);
 		//check if we have data persisted in the activity 
 		//landscape orientation or activity destroyed
 		
+		//Chromecast setup
+		mMediaRouter = MediaRouter.getInstance(getApplicationContext());
+		mMediaRouteSelector = new MediaRouteSelector.Builder()
+		  .addControlCategory(CastMediaControlIntent.categoryForCast(CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID))
+		  .build();
+		mMediaRouterCallback = new MyMediaRouterCallback();
 
 		RedditTVSemiPersistedData activityPersistedData = getLastNonConfigurationInstance();
 		if (activityPersistedData!=null){
@@ -192,11 +210,12 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 		updateLoadMoreText();
 	}
 
-
+	/*TODO
 	@Override
 	public RedditTVSemiPersistedData onRetainNonConfigurationInstance() {
 		return new RedditTVSemiPersistedData(postsListAdapter, redditAPI,currentSubreddit,currentCategory,currentPeriod);
 	}
+	*/
 	
 	@Override
 	public RedditTVSemiPersistedData getLastNonConfigurationInstance() {
@@ -216,6 +235,7 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 	@Override
 	protected void onPause() {
 		Log.d("RedditTV", "onPause called");
+		mMediaRouter.removeCallback(mMediaRouterCallback);
 		super.onPause();
 	}
 
@@ -231,17 +251,29 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 			finish();
 			startActivity(intent);
 		}
+		
+		mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
+			    MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
 	}
 
 	@Override
 	protected void onStop() {
 		Log.d("RedditTV", "onStop called");
+		mMediaRouter.removeCallback(mMediaRouterCallback);
 		super.onStop();
 	}
 	
 	@Override
 	protected void onRestart() {
 		Log.d("RedditTV", "onRestart called");
+		super.onStop();
+	}
+	
+	@Override
+	protected void onStart() {
+		Log.d("RedditTV", "onStart called");
+		mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
+			    MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
 		super.onStop();
 	}
 
@@ -489,9 +521,42 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
+		//Chromecast setup
+		MenuItem mediaRouteMenuItem = menu.findItem(R.id.media_route_menu_item);
+		MediaRouteActionProvider mediaRouteActionProvider = 
+		    (MediaRouteActionProvider) MenuItemCompat.getActionProvider(mediaRouteMenuItem);
+		  mediaRouteActionProvider.setRouteSelector(mMediaRouteSelector);
+		  
 		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		int itemId = item.getItemId();
+		if (itemId == R.id.menuPickSubreddit) {
+			displayPickSubredditDialog();
+			return true;
+		} else if (itemId == R.id.menuSortBy) {
+			displayCategoryDialog();
+			return true;
+		} else if (itemId == R.id.menuClearList) {
+			actionClearList();
+			return true;
+		} else if (itemId == R.id.menuAbout) {
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://redd.it/gsmet")));
+			return true;
+		} else if (itemId == R.id.menuPreferences) {
+			Intent iPreferences = new Intent(this, RedditTVPreferences.class);
+			startActivity(iPreferences);
+			return true;
+		} else {
+			return super.onOptionsItemSelected(item);
+		}
+
+	}
+	
+	/* TODO
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		
@@ -517,7 +582,9 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 			return super.onMenuItemSelected(featureId, item);
 		}
 
-	}
+	}*/
+
+
 
 	public void displayPickSubredditDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -662,14 +729,30 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 		
 	}
 
+class MyMediaRouterCallback extends MediaRouter.Callback {
 
+		CastDevice mSelectedDevice;
+		
+		  @Override
+		  public void onRouteSelected(MediaRouter router, RouteInfo info) {
+		    mSelectedDevice = CastDevice.getFromBundle(info.getExtras());
+		    String routeId = info.getId();
+		  }
 
-	/**
-	 * Async method of retrieving reddit posts Create new object for each
-	 * invocation Uses redditAPI object (must be initialized) Uses
-	 * postsListAdapter (must be initialized) by populating with new RedditPosts
-	 */
-	class AddRedditPostsTask extends AsyncTask<Void, String, Throwable> {
+		  @Override
+		  public void onRouteUnselected(MediaRouter router, RouteInfo info) {
+		    //teardown();
+		    mSelectedDevice = null;
+		  }
+}
+	
+
+/**
+ * Async method of retrieving reddit posts Create new object for each
+ * invocation Uses redditAPI object (must be initialized) Uses
+ * postsListAdapter (must be initialized) by populating with new RedditPosts
+ */
+class AddRedditPostsTask extends AsyncTask<Void, String, Throwable> {
 		private String subreddit;
 		private String category;
 		private String period;
@@ -844,14 +927,14 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 		protected void onProgressUpdate (String ... status){
 			notifyUser(status[0]);
 		}
-	}
+}
 	
 	
 	
-	/**
-	 * Async method of playing the sound of a youtube video in the backgroun
-	 */
-	class ListenToTask extends AsyncTask<Void, String, Throwable> {
+/**
+ * Async method of playing the sound of a youtube video in the backgroun
+ */
+class ListenToTask extends AsyncTask<Void, String, Throwable> {
 		private Context context;
 		RedditPost redditPost;
 
@@ -1032,9 +1115,9 @@ public class RedditTV extends Activity implements OnCreateContextMenuListener,
 		//set the theme
 		String theme= sharedPreferences.getString(RedditTVPreferences.KEY_THEME, RedditTVPreferences.DEFAULT_VALUE_THEME);
 		if(RedditTVPreferences.THEME_NORMAL.equals(theme)){
-			setTheme(R.style.Theme_Normal);
+			setTheme(R.style.AppTheme_Normal);
 		}else if(RedditTVPreferences.THEME_LARGE.equals(theme)){
-			setTheme(R.style.Theme_Large);
+			setTheme(R.style.AppTheme_Large);
 		}
 	}
 

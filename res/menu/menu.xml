@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/menuPickSubreddit" android:title="@string/menuPickSubreddit"
-		android:icon="@android:drawable/ic_menu_myplaces" />
-	<item android:id="@+id/menuSortBy" android:title="@string/menuSortBy"
-		android:icon="@android:drawable/ic_menu_sort_by_size" />
-	<item android:id="@+id/menuClearList" android:title="@string/menuClearList"
-		android:icon="@android:drawable/ic_menu_close_clear_cancel" />
-		
-	<item android:id="@+id/menuAbout" android:title="@string/menuAbout"
-		android:icon="@android:drawable/ic_menu_info_details" />		
-	<item android:id="@+id/menuPreferences" android:title="@string/menuPreferences"
-		android:icon="@android:drawable/ic_menu_preferences" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"  >
+    <item
+        android:id="@+id/media_route_menu_item"
+        android:title="@string/media_route_menu_title"
+        app:actionProviderClass="android.support.v7.app.MediaRouteActionProvider"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/menuPickSubreddit"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/menuPickSubreddit"/>
+    <item
+        android:id="@+id/menuSortBy"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="@string/menuSortBy"/>
+    <item
+        android:id="@+id/menuClearList"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:title="@string/menuClearList"/>
+    <item
+        android:id="@+id/menuAbout"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/menuAbout"/>
+    <item
+        android:id="@+id/menuPreferences"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/menuPreferences"/>
+
 </menu>

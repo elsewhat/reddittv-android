@@ -78,8 +78,8 @@ public class RedditTVPreferences extends PreferenceActivity implements
 	public static final boolean DEFAULT_VALUE_DO_RICKROLL = false;
 	public static final String DEFAULT_VALUE_RICKROLL_PERCENTAGE = "50";
 	//Should match the theme_values in strings
-	public static final String THEME_NORMAL = "Theme.Normal";
-	public static final String THEME_LARGE = "Theme.Large";
+	public static final String THEME_NORMAL = "AppTheme.Normal";
+	public static final String THEME_LARGE = "AppTheme.Large";
 	public static final String DEFAULT_VALUE_THEME = THEME_NORMAL;
 	public static final String DEFAULT_NUMBER_OF_VIDEOS_WATCHED = "0";
 	

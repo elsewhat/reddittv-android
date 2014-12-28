@@ -66,8 +66,8 @@
 		<item>Large</item>
 	</string-array>
 	<string-array name="themes_values">
-		<item>Theme.Normal</item>
-		<item>Theme.Large</item>
+		<item>AppTheme.Normal</item>
+		<item>AppTheme.Large</item>
 	</string-array>	
 
 	<string name="contextMenuWatch">Watch</string>
@@ -179,6 +179,7 @@
 <string name="lblRickrollProbabilityTitle">Rickroll probability</string>
 <string name="lblRickrollProbabilityDialogTitle">Rickroll probability (1-100)</string>
 <string name="lblRickrollProbabilitySummary">Rickroll probability is</string>
+<string name="media_route_menu_title">Cast</string>
 
 </resources>
 

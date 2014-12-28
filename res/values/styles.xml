@@ -53,10 +53,10 @@
         
    
   <!-- Base application theme is the default theme. -->
-  <style name="Theme" parent="android:Theme">
+  <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
   </style>
 
-  <style name="Theme.Normal">
+  <style name="AppTheme.Normal">
      <item name="styleVideoTitle">@style/small_title_text</item>
      <item name="styleAppTitle">@style/large_title_text</item>
      <item name="styleLoadMoreTitle">@style/large_title_text</item>
@@ -68,7 +68,7 @@
      
   </style>
 
-  <style name="Theme.Large">
+  <style name="AppTheme.Large">
       <item name="styleVideoTitle">@style/large_title_text</item>
       <item name="styleAppTitle">@style/xlarge_title_text</item>
       <item name="styleLoadMoreTitle">@style/xlarge_title_text</item>
