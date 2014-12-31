@@ -14,8 +14,21 @@ import org.xbmc.api.business.INotifiableManager;
 import org.xbmc.httpapi.Connection;
 import org.xbmc.httpapi.client.ControlClient;
 
+import com.google.android.gms.cast.ApplicationMetadata;
+import com.google.android.gms.cast.Cast;
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.cast.CastMediaControlIntent;
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaStatus;
+import com.google.android.gms.cast.RemoteMediaPlayer;
+import com.google.android.gms.cast.RemoteMediaPlayer.MediaChannelResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -64,7 +77,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 @SuppressLint("WorldReadableFiles")
 public class RedditTV extends ActionBarActivity implements OnCreateContextMenuListener,
-		OnItemClickListener, OnClickListener, OnLongClickListener, OnSharedPreferenceChangeListener {
+		OnItemClickListener, OnClickListener, OnLongClickListener, OnSharedPreferenceChangeListener, ConnectionCallbacks, OnConnectionFailedListener {
 	private static final int ACTION_WATCH = Menu.FIRST;
 	private static final int ACTION_COMMENTS = Menu.FIRST + 1;
 	private static final int ACTION_SENDTO = Menu.FIRST + 2;
@@ -95,8 +108,12 @@ public class RedditTV extends ActionBarActivity implements OnCreateContextMenuLi
 	private boolean themeHasBeenChanged = false;
 	private MediaRouter mMediaRouter=null;
 	private MediaRouteSelector mMediaRouteSelector;
-	private Callback mMediaRouterCallback;
-	
+	private MyMediaRouterCallback mMediaRouterCallback;
+	private GoogleApiClient mApiClient;
+	private RemoteMediaPlayer mRemoteMediaPlayer;
+	private String CHROMECAST_APP_ID="233637DE";
+	//=CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
+	private YoutubeChannel youtubeChannel;
 	
 	
 	
@@ -117,9 +134,10 @@ public class RedditTV extends ActionBarActivity implements OnCreateContextMenuLi
 		//landscape orientation or activity destroyed
 		
 		//Chromecast setup
+		setupChromecastMediaPlayer();
 		mMediaRouter = MediaRouter.getInstance(getApplicationContext());
 		mMediaRouteSelector = new MediaRouteSelector.Builder()
-		  .addControlCategory(CastMediaControlIntent.categoryForCast(CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID))
+		  .addControlCategory(CastMediaControlIntent.categoryForCast(CHROMECAST_APP_ID))
 		  .build();
 		mMediaRouterCallback = new MyMediaRouterCallback();
 
@@ -454,6 +472,88 @@ public class RedditTV extends ActionBarActivity implements OnCreateContextMenuLi
 
 	}
 	
+	private void actionSendToChromecast(RedditPost redditPost) {
+		//let us always use the youtube id and generate our own url
+		String postUrl = "http://www.youtube.com/watch?v="+redditPost.getYoutubeId();
+		
+		//check if we're in rickroll mode!
+		SharedPreferences settings = getSharedPreferences(RedditTVPreferences.PREFS_NAME, MODE_WORLD_READABLE);
+		boolean doRickrollMode= settings.getBoolean(RedditTVPreferences.KEY_RICKROLL, false);
+		if(doRickrollMode){
+			int percentage=50;
+			try {
+				String strPercentage= settings.getString(RedditTVPreferences.KEY_RICKROLL_PERCENTAGE,RedditTVPreferences.DEFAULT_VALUE_RICKROLL_PERCENTAGE );
+				percentage = Integer.parseInt(strPercentage);
+			}catch (NumberFormatException e) {
+				Log.w("RedditTV", "Rickroll percentage was not a number", e);
+			}
+			
+			Random random = new Random(System.currentTimeMillis());
+			//get int from [1,100]
+			int randomInt =random.nextInt(100)+1;
+			
+			if(percentage>=randomInt){
+				Log.w("RedditTV", "Prepare to be rickrolled!");
+				Analytics.trackEvent(this, "RedditTV", "sendto", "rickroll");
+				postUrl= "http://www.youtube.com/watch?v=oHg5SJYRHA0";
+			}
+		}
+		
+		CastDevice chromecastDevice = mMediaRouterCallback.getSelectedDevice();
+		if(chromecastDevice==null){
+			Toast.makeText(this, R.string.msgNotConnectedChromecast, Toast.LENGTH_LONG)
+			.show();
+			Log.w("RedditTV", "Not connected to chromecast (chromecast device is null)");
+			return;
+		}
+		YoutubeChannel youtubeChannel = new YoutubeChannel();
+		String message = "{type:'flingVideo', data:{videoId:'"+redditPost.getYoutubeId()+"' ,currentTime:0,} };";
+		Log.w("RedditTV", "Chromecast message to "+ youtubeChannel.getNamespace() + " :"+message);
+		  try {
+			    Cast.CastApi.sendMessage(mApiClient, youtubeChannel.getNamespace(), message)
+			    .setResultCallback(
+			      new ResultCallback<Status>() {
+			        @Override
+			        public void onResult(Status result) {
+			        	
+			          if (!result.isSuccess()) {
+			            Log.e("RedditTV", "Sending message failed");
+			          }
+			        }
+			      });
+			  } catch (Exception e) {
+			    Log.e("RedditTV", "Exception while sending message", e);
+			  }
+
+		
+		
+		/*
+		MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+		mediaMetadata.putString(MediaMetadata.KEY_TITLE, redditPost.getTitle());
+		MediaInfo mediaInfo = new MediaInfo.Builder(
+			postUrl)
+		    //.setContentType("video/mp4")
+		    .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+		    .setMetadata(mediaMetadata)
+		              .build();
+		try {
+		  mRemoteMediaPlayer.load(mApiClient, mediaInfo, true)
+		     .setResultCallback(new ResultCallback<RemoteMediaPlayer.MediaChannelResult>() {
+		    @Override
+		    public void onResult(MediaChannelResult result) {
+		      if (result.getStatus().isSuccess()) {
+		        Log.d("RedditTV", "Media loaded successfully");
+		      }
+		    }
+		     });
+		} catch (IllegalStateException e) {
+		  Log.e("RedditTV", "Problem occurred with media during loading", e);
+		} catch (Exception e) {
+		  Log.e("RedditTV", "Problem opening media during loading", e);
+		}*/
+		
+	}
+	
 	/**
 	 * Action for saving a reddit.
 	 * Errors and messages to user is handled as part of this method
@@ -495,7 +595,11 @@ public class RedditTV extends ActionBarActivity implements OnCreateContextMenuLi
 		//find the default action
 		SharedPreferences settings = getSharedPreferences(RedditTVPreferences.PREFS_NAME, MODE_WORLD_READABLE);
 		String action=settings.getString(RedditTVPreferences.KEY_DEFAULT_CLICK_ACTION, RedditTVPreferences.DEFAULT_VALUE_CATEGORY_ONLOAD);
-		if(RedditTVPreferences.DEFAULT_ACTION_WATCH.equalsIgnoreCase(action)){
+		
+		//If chromecast device is connected always choose it
+		if(mMediaRouterCallback!= null && mMediaRouterCallback.getSelectedDevice()!=null){
+			actionSendToChromecast(redditPost);
+		}else if(RedditTVPreferences.DEFAULT_ACTION_WATCH.equalsIgnoreCase(action)){
 			actionWatch(redditPost);
 		}else if (RedditTVPreferences.DEFAULT_ACTION_XBMC.equalsIgnoreCase(action)){
 			actionSendToXBMC(redditPost);
@@ -728,6 +832,39 @@ public class RedditTV extends ActionBarActivity implements OnCreateContextMenuLi
 	
 		
 	}
+	
+	private void onSelectedChromecastDevice(CastDevice chromecastDevice){
+		Cast.Listener mCastClientListener = new Cast.Listener() {
+			  @Override
+			  public void onApplicationStatusChanged() {
+			      Log.d("RedditTV", "onApplicationStatusChanged:");
+			  }
+
+			  @Override
+			  public void onVolumeChanged() {
+			    Log.d("RedditTV", "onVolumeChanged: ");
+			  }
+
+			  @Override
+			  public void onApplicationDisconnected(int errorCode) {
+			  }
+			};
+		
+		Cast.CastOptions.Builder apiOptionsBuilder = Cast.CastOptions
+		        .builder(chromecastDevice, mCastClientListener);
+		
+		mApiClient = new GoogleApiClient.Builder(this)
+		                .addApi(Cast.API, apiOptionsBuilder.build())
+		                .addConnectionCallbacks(this)
+		                .addOnConnectionFailedListener(this)
+		                .build();
+
+		mApiClient.connect();
+	}
+	
+	private void onUnselectedChromecastDevice(){
+		
+	}
 
 class MyMediaRouterCallback extends MediaRouter.Callback {
 
@@ -737,12 +874,18 @@ class MyMediaRouterCallback extends MediaRouter.Callback {
 		  public void onRouteSelected(MediaRouter router, RouteInfo info) {
 		    mSelectedDevice = CastDevice.getFromBundle(info.getExtras());
 		    String routeId = info.getId();
+		    onSelectedChromecastDevice(mSelectedDevice);
 		  }
-
+	
 		  @Override
 		  public void onRouteUnselected(MediaRouter router, RouteInfo info) {
 		    //teardown();
 		    mSelectedDevice = null;
+		    onUnselectedChromecastDevice();
+		  }
+		  
+		  public CastDevice getSelectedDevice(){
+			  return mSelectedDevice;
 		  }
 }
 	
@@ -1151,4 +1294,107 @@ class ListenToTask extends AsyncTask<Void, String, Throwable> {
 		
 		
 	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onConnected(Bundle arg0) {
+	      try {
+	          Cast.CastApi.launchApplication(mApiClient, CHROMECAST_APP_ID, false)
+	            .setResultCallback(
+	               new ResultCallback<Cast.ApplicationConnectionResult>() {
+
+				@Override
+	              public void onResult(Cast.ApplicationConnectionResult result) {
+	                  Status status = result.getStatus();
+	                  if (status.isSuccess()) {
+	                    ApplicationMetadata applicationMetadata = 
+	                                                    result.getApplicationMetadata();
+	                    String sessionId = result.getSessionId();
+	                    String applicationStatus = result.getApplicationStatus();
+	                    boolean wasLaunched = result.getWasLaunched();
+	                    
+	                    youtubeChannel = new YoutubeChannel();
+	                    
+	                    try {
+	                    	 /*Cast.CastApi.setMessageReceivedCallbacks(mApiClient,
+	                    	         mRemoteMediaPlayer.getNamespace(), mRemoteMediaPlayer);
+	                    	         */
+	                    	Cast.CastApi.setMessageReceivedCallbacks(mApiClient,
+	                    			youtubeChannel.getNamespace(),
+	                    			youtubeChannel);
+	                    	
+	                    	} catch (IOException e) {
+	                    	  Log.e("RedditTV", "Exception while creating media channel", e);
+	                    	}
+	                    	/*
+	                    	mRemoteMediaPlayer
+	                    	  .requestStatus(mApiClient)
+	                    	  .setResultCallback(
+	                    	    new ResultCallback<RemoteMediaPlayer.MediaChannelResult>() {
+	                    	      @Override
+	                    	      public void onResult(MediaChannelResult result) {
+	                    	        if (!result.getStatus().isSuccess()) {
+	                    	          Log.e("RedditTV", "Failed to request status.");
+	                    	        }
+	                    	      }
+	                    	    });
+	                    */
+	                    
+	                  } else {
+	                    //teardown();
+	                  }
+	              }
+	          });
+
+	        } catch (Exception e) {
+	          Log.e("RedditTV", "Failed to launch application", e);
+	        }
+	}
+	
+	public void setupChromecastMediaPlayer(){
+		mRemoteMediaPlayer = new RemoteMediaPlayer();
+		mRemoteMediaPlayer.setOnStatusUpdatedListener(
+		                           new RemoteMediaPlayer.OnStatusUpdatedListener() {
+		  @Override
+		  public void onStatusUpdated() {
+		    MediaStatus mediaStatus = mRemoteMediaPlayer.getMediaStatus();
+		    /*
+		    boolean isPlaying = mediaStatus.getPlayerState() == 
+		            MediaStatus.PLAYER_STATE_PLAYING;
+		            */
+		  }
+		});
+
+		mRemoteMediaPlayer.setOnMetadataUpdatedListener(
+		                           new RemoteMediaPlayer.OnMetadataUpdatedListener() {
+		  @Override
+		  public void onMetadataUpdated() {
+		    MediaInfo mediaInfo = mRemoteMediaPlayer.getMediaInfo();
+		    //MediaMetadata metadata = mediaInfo.getMetadata();
+		  }
+		});
+	}
+
+	@Override
+	public void onConnectionSuspended(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	class YoutubeChannel implements Cast.MessageReceivedCallback {
+		  public String getNamespace() {
+		    return "urn:x-cast:com.google.youtube.mdx";
+		  }
+
+		  @Override
+		  public void onMessageReceived(CastDevice castDevice, String namespace,
+		        String message) {
+		    Log.d("RedditTV", "onMessageReceived: " + message);
+		  }
+		}
 }
