@@ -3,6 +3,7 @@ package org.elsewhat.reddit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Random;
 
 import org.apache.http.client.CookieStore;
@@ -111,9 +112,13 @@ public class RedditTV extends ActionBarActivity implements OnCreateContextMenuLi
 	private MyMediaRouterCallback mMediaRouterCallback;
 	private GoogleApiClient mApiClient;
 	private RemoteMediaPlayer mRemoteMediaPlayer;
-	private String CHROMECAST_APP_ID="233637DE";
+	private String CHROMECAST_APP_ID="951ACD65";
+	//="951ACD65";
+	// youtube="233637DE";
 	//=CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
-	private YoutubeChannel youtubeChannel;
+	private String CHROMECAST_NARWHAL_NAMESPACE="urn:x-cast:org.elsewhat.narwhal";
+
+	private NarwhalTVChannel narwhalTVChannel;
 	
 	
 	
@@ -506,11 +511,13 @@ public class RedditTV extends ActionBarActivity implements OnCreateContextMenuLi
 			Log.w("RedditTV", "Not connected to chromecast (chromecast device is null)");
 			return;
 		}
-		YoutubeChannel youtubeChannel = new YoutubeChannel();
-		String message = "{type:'flingVideo', data:{videoId:'"+redditPost.getYoutubeId()+"' ,currentTime:0,} };";
-		Log.w("RedditTV", "Chromecast message to "+ youtubeChannel.getNamespace() + " :"+message);
+		Locale locale = Locale.ENGLISH;
+		
+		double time = System.currentTimeMillis();
+		String message = String.format(locale,"{\"type\":\"flingVideo\", \"data\":{\"videoId\":\""+redditPost.getYoutubeId()+"\" ,\"currentTime\":%.2f}}",time) ;
+		Log.w("RedditTV", "Chromecast message to "+ narwhalTVChannel.getNamespace() + " :"+message);
 		  try {
-			    Cast.CastApi.sendMessage(mApiClient, youtubeChannel.getNamespace(), message)
+			    Cast.CastApi.sendMessage(mApiClient, narwhalTVChannel.getNamespace(), message)
 			    .setResultCallback(
 			      new ResultCallback<Status>() {
 			        @Override
@@ -1318,15 +1325,15 @@ class ListenToTask extends AsyncTask<Void, String, Throwable> {
 	                    String applicationStatus = result.getApplicationStatus();
 	                    boolean wasLaunched = result.getWasLaunched();
 	                    
-	                    youtubeChannel = new YoutubeChannel();
+	                    narwhalTVChannel = new NarwhalTVChannel();
 	                    
 	                    try {
-	                    	 /*Cast.CastApi.setMessageReceivedCallbacks(mApiClient,
-	                    	         mRemoteMediaPlayer.getNamespace(), mRemoteMediaPlayer);
-	                    	         */
 	                    	Cast.CastApi.setMessageReceivedCallbacks(mApiClient,
-	                    			youtubeChannel.getNamespace(),
-	                    			youtubeChannel);
+	                    	         mRemoteMediaPlayer.getNamespace(), mRemoteMediaPlayer);
+	                    	         
+	                    	Cast.CastApi.setMessageReceivedCallbacks(mApiClient,
+	                    			narwhalTVChannel.getNamespace(),
+	                    			narwhalTVChannel);
 	                    	
 	                    	} catch (IOException e) {
 	                    	  Log.e("RedditTV", "Exception while creating media channel", e);
@@ -1386,6 +1393,18 @@ class ListenToTask extends AsyncTask<Void, String, Throwable> {
 		
 	}
 	
+	class NarwhalTVChannel implements Cast.MessageReceivedCallback {
+		  public String getNamespace() {
+			    return CHROMECAST_NARWHAL_NAMESPACE;
+			  }
+
+			  @Override
+			  public void onMessageReceived(CastDevice castDevice, String namespace,
+			        String message) {
+			    Log.d("RedditTV", "onMessageReceived: Narwhal " + message);
+			  }
+	}
+	
 	class YoutubeChannel implements Cast.MessageReceivedCallback {
 		  public String getNamespace() {
 		    return "urn:x-cast:com.google.youtube.mdx";
@@ -1396,5 +1415,5 @@ class ListenToTask extends AsyncTask<Void, String, Throwable> {
 		        String message) {
 		    Log.d("RedditTV", "onMessageReceived: " + message);
 		  }
-		}
+	}
 }
