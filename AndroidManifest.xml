@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="org.elsewhat.reddit" android:versionCode="18"
-	android:versionName="2.0"
+	package="org.elsewhat.reddit" android:versionCode="19"
+	android:versionName="2.01"
 	android:installLocation="auto"
 	
 	>
@@ -12,6 +12,7 @@
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
+				<category android:name="android.intent.category.LEANBACK_LAUNCHER" />
 			</intent-filter>
 		</activity>
 
